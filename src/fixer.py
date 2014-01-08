@@ -13,6 +13,7 @@ from dateutil.tz import gettz
 
 
 class SMS(object):
+    """Class to encapsulate a single SMS message."""
 
     RECEIVED = 1
     SENT = 2
@@ -59,6 +60,7 @@ class SMS(object):
 
 
 def parse_args():
+    """Parses arguments."""
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('input', type=argparse.FileType('r'), nargs='+',
                         help='input files')
@@ -67,6 +69,8 @@ def parse_args():
                         help='output filename')
     parser.add_argument('--timezone', type=str, default=None,
                         help='timezone (default: local)')
+    parser.add_argument('--contacts', type=str, default=None,
+                        help='example contacts')
     return parser.parse_args()
 
 
@@ -80,6 +84,10 @@ def get_names(soup):
 
 
 def parse_numbers(soup):
+    """Returns list of tuples of names and numbers for each message in 
+    the page.
+
+    """
     # Parse names
     names = [e.text for e in soup.find_all(class_='fn')]
 
@@ -92,9 +100,11 @@ def parse_numbers(soup):
 
 
 def create_address_book(soups):
+    """Parses all HTML files to create a 'default' address book in case 
+    there is an HTML file where the contact did not reply and we cannot
+    determine the contact's phone number."""
     address_book = {}
     for soup in soups:
-        # Update address book
         address_book.update(parse_numbers(soup))
     return address_book
 
@@ -119,11 +129,8 @@ def fix_sms(input=[], output=sys.stdout, timezone=None, logger=None):
     logger.info("Processing messages.")
     for soup in soups:
         my_name, contact_name = get_names(soup)
-        # address = address_book.get(contact_name, '')
         conversation_address_book = dict(parse_numbers(soup))
-        print conversation_address_book
         if contact_name not in conversation_address_book:
-
             address = address_book.get(contact_name, '')
         else:
             address = conversation_address_book.get(contact_name)
@@ -141,22 +148,26 @@ def fix_sms(input=[], output=sys.stdout, timezone=None, logger=None):
         filename = output.name
     else:
         filename = "<unknown file>"
+    
     logger.info("Outputing XML to {0}".format(filename))
     date = datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-    xml = ""
-    xml += ("""<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+
+    xml = ["""<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <!--File Created By sms-fixer on {date}-->
 <?xml-stylesheet type="text/xsl" href="sms.xsl"?>
-<smses count="{count}">\n""".format(date=date, count=len(all_messages)))
+<smses count="{count}">\n""".format(date=date, count=len(all_messages))]
     for message in all_messages:
-        xml += "  {message}\n".format(message=message.to_xml())
-    xml += "</smses>"
+        xml.append("  {message}\n".format(message=message.to_xml()))
+    xml.append("</smses>")
+
+    xml = ''.join(xml)
     output.write(xml)
     logger.info('Done.')
     return xml
 
 
 def main():
+    """Main function called when run as main module."""
     logging.basicConfig()
     logger = logging.getLogger('fixer')
     logger.setLevel(logging.INFO)
