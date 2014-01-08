@@ -36,9 +36,10 @@ def fix():
                 output=output_file,
                 logger=app.logger,
                 address_book=address_book)
-            print missing
-    except:
+    except Exception as ex:
         error = "An unknown error occurred."
+        if app.debug == True:
+            error += "\n" + str(ex)
         return render_template(
             'index.html', output=filename, contacts=contacts, error=error)
     return render_template(
