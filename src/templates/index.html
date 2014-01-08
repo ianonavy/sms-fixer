@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>SMS Fixer</title>
+	<style>
+		html, body { margin: 0; padding: 0; }
+		h1 { font-size: 36px; line-height: 0; }
+		h2 { font-size: 24px; line-height: 1.15; }
+
+		.aligner {
+			display: -webkit-box;
+			display: -webkit-flex;
+			display: -moz-box;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-align: center;
+			-webkit-align-items: center;
+			-moz-box-align: center;
+			-ms-flex-align: center;
+			align-items: center;
+			-webkit-box-pack: center;
+			-webkit-justify-content: center;
+			-moz-box-pack: center;
+			-ms-flex-pack: center;
+			justify-content: center;
+			min-height: 100vh;
+		}
+
+		#main {
+			font: 13px Arial, sans-serif;
+		}
+
+		#output-filename {
+			width: 176px;
+			padding: 4px;
+			margin: 3px; 
+			border: 1px solid #acb1b7;
+			background-color: #fcfcfc;
+		}
+
+		.notes {
+			font-style: italic;
+			line-height: 1;
+		}
+	</style>
+</head>
+<body class="aligner">
+	<div id="main">
+		<h1>SMS Fixer</h1>
+		<h2>Recover from Google Voice</h2>
+		<form id="fix-sms-form" method="post" action="{{ url_for('fix') }}" enctype="multipart/form-data">
+			<p class="notes">Drag Google Voice HTML files onto the button below:</p>
+			<div class="form-element">
+				<label for="input-files">Input HTML files:</label>
+				<input name="input-files[]" id="input-files" type="file" multiple="" />
+			</div>
+			<div class="form-element">
+				<label for="output-filename">Output filename:</label>
+				<input name="output-filename" id="output-filename" type="text" placeholder="output">.xml
+			</div>
+			<div class="form-element">
+				<input type="submit" name="submit" id="submit" value="Convert">
+			</div>
+		</form>
+		<div id="notes" class="notes">
+			<p>Save the output file with ctrl+s (cmd+s on Mac).</p>
+			<p>Use with <a href="https://play.google.com/store/apps/details?id=com.riteshsahu.SMSBackupRestore&amp;hl=en">SMS Backup &amp; Restore</a>.</p>
+		</div>
+		<a href="https://github.com/ianonavy/sms-fixer"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+	</div>
+</body>
+<!-- Made with love by ianonavy (ianonavy.com) -->
+</html>
