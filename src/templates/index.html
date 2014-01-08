@@ -39,6 +39,10 @@
 			width: 176px;
 		}
 
+		#contacts {
+			width: 351px;
+		}
+
 		.textbox {
 			padding: 4px;
 			margin: 3px; 
@@ -52,34 +56,32 @@
 		}
 
 		#disclaimers {
-			position: absolute;
+			position: fixed;
 			left: 0;
 			bottom: 0;
 			width: 100%;
 			font: 10px Arial, sans-serif;
 		}
 
+		.alert {
+			padding: 16px;
+		}
+
 		.success {
 			background-color: #cfc;
 			border: 1px solid #0c0;
-			font: red;
-			padding: 16px;
 			color: #060;
 		}
 
 		.warning {
 			background-color: #ffc;
 			border: 1px solid #cc0;
-			font: red;
-			padding: 16px;
 			color: #660;
 		}
 
 		.error {
 			background-color: #fcc;
 			border: 1px solid #f00;
-			font: red;
-			padding: 16px;
 			color: #f00;
 		}
 
@@ -100,12 +102,12 @@
 	<div id="main">
 		<h1>SMS Fixer</h1>
 		{%- if error -%}
-		<div class="error">
+		<div class="alert error">
 			{{ error }}
 		</div>
 		{%- elif link %}
 		{%- if missing %}
-		<div class="warning">
+		<div class="alert warning">
 			Missing numbers:
 			<ul>
 				{%- for name in missing %}
@@ -114,7 +116,7 @@
 			</ul>
 		</div>
 		{%- else %}
-		<div class="success">
+		<div class="alert success">
 			Conversion successful!
 		</div>
 		{%- endif %}
@@ -135,7 +137,7 @@
 			</div>
 			<div class="form-element">
 				<label for="contacts">Address book (in case of missing numbers):</label>
-				<textarea name="contacts" id="contacts" class="textbox" cols="36" rows="3" placeholder="First Last: +1##########">{{ contacts }}</textarea>
+				<textarea name="contacts" id="contacts" class="textbox" rows="3" placeholder="First Last: +1##########">{{ contacts }}</textarea>
 			</div>
 			<div class="form-element">
 				<input type="submit" name="submit" id="submit" value="Convert">
