@@ -28,7 +28,7 @@ Exact commands vary with OS.
 
 For the Web service (CentOS-tested only):
 
-1. Symlink or copy the file `conf/nginx.conf` into the nginx configuration directory (e.g. `/etc/nginx/conf.d/sms-fixer.conf' for CentOS).
+1. Symlink or copy the file `conf/nginx.conf` into the nginx configuration directory (e.g. `/etc/nginx/conf.d/sms-fixer.conf` for CentOS).
 2. Symlink or copy the file `conf/supervisord.conf` into the supervisord configuration directory.
 3. Reload the config files of both nginx and supervisord, and ensure that both daemons are running.
 
