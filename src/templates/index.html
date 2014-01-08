@@ -10,6 +10,7 @@
 		html, body { margin: 0; padding: 0; }
 		h1 { font-size: 36px; line-height: 0; }
 		h2 { font-size: 24px; line-height: 1.15; }
+		textarea { display: block; }
 
 		.aligner {
 			display: -webkit-box;
@@ -36,6 +37,9 @@
 
 		#output-filename {
 			width: 176px;
+		}
+
+		.textbox {
 			padding: 4px;
 			margin: 3px; 
 			border: 1px solid #acb1b7;
@@ -54,21 +58,84 @@
 			width: 100%;
 			font: 10px Arial, sans-serif;
 		}
+
+		.success {
+			background-color: #cfc;
+			border: 1px solid #0c0;
+			font: red;
+			padding: 16px;
+			color: #060;
+		}
+
+		.warning {
+			background-color: #ffc;
+			border: 1px solid #cc0;
+			font: red;
+			padding: 16px;
+			color: #660;
+		}
+
+		.error {
+			background-color: #fcc;
+			border: 1px solid #f00;
+			font: red;
+			padding: 16px;
+			color: #f00;
+		}
+
+		{%- if link %}
+		#download {
+			text-decoration: none;
+			margin: 2px;
+			padding: 4px;
+			color: #fff;
+			background-color: #3276b1;
+			border-color: #285e8e;
+			border-radius: 2px;
+		}
+		{%- endif %}
 	</style>
 </head>
 <body class="aligner">
 	<div id="main">
 		<h1>SMS Fixer</h1>
+		{%- if error -%}
+		<div class="error">
+			{{ error }}
+		</div>
+		{%- elif link %}
+		{%- if missing %}
+		<div class="warning">
+			Missing numbers:
+			<ul>
+				{%- for name in missing %}
+				<li>{{ name }}</li>
+				{%- endfor %}
+			</ul>
+		</div>
+		{%- else %}
+		<div class="success">
+			Conversion successful!
+		</div>
+		{%- endif %}
+		<div>
+			<p><a id="download" href="{{ link }}">Download</a> (or right-click > Save Link As...)</p>
+		</div>
+		{%- endif %}
 		<h2>Recover from Google Voice</h2>
 		<form id="fix-sms-form" method="post" action="{{ url_for('fix') }}" enctype="multipart/form-data">
 			<p class="notes">Drag Google Voice HTML files onto the button below:</p>
 			<div class="form-element">
-				<label for="input-files">Input HTML files:</label>
-				<input name="input-files[]" id="input-files" type="file" multiple="" />
+				<label for="input-files">Input HTML files*:</label>
+				<input name="input-files[]" id="input-files" type="file" multiple="" value="" {%- if error or missing %}style="font-weight: bold"{%- endif %}/>
 			</div>
 			<div class="form-element">
 				<label for="output-filename">Output filename:</label>
-				<input name="output-filename" id="output-filename" type="text" placeholder="output">.xml
+				<input name="output-filename" id="output-filename" type="text" placeholder="output" class="textbox" value="{{ output }}">.xml
+			</div>
+			<div class="form-element">
+				<label for="contacts">Address book (in case of missing numbers):</label>
+				<textarea name="contacts" id="contacts" class="textbox" cols="36" rows="3" placeholder="First Last: +1##########">{{ contacts }}</textarea>
 			</div>
 			<div class="form-element">
 				<input type="submit" name="submit" id="submit" value="Convert">

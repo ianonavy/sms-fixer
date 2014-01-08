@@ -21,12 +21,32 @@ def home():
 @app.route('/fix/', methods=['POST'])
 def fix():
     filename = secure_filename(request.form.get('output-filename')) or 'output'
-    with open(os.path.join(OUTPUT_PATH, filename + '.xml'), 'w') as output_file:
-        fix_sms(
-            input=request.files.getlist('input-files[]'), 
-            output=output_file,
-            logger=app.logger)
-    return redirect(url_for('get_file', filename=filename))
+    files = request.files.getlist('input-files[]')
+    contacts = request.form.get('contacts')
+    if files[0].filename == '':
+        error = "You need to upload some files."
+        return render_template(
+            'index.html', output=filename, contacts=contacts, error=error)
+    try:
+        address_book = dict([line.split(':') for line in contacts.split('\n')
+                                             if ':' in line])
+        with open(os.path.join(OUTPUT_PATH, filename + '.xml'), 'w') as output_file:
+            _, missing = fix_sms(
+                input=files, 
+                output=output_file,
+                logger=app.logger,
+                address_book=address_book)
+            print missing
+    except:
+        error = "An unknown error occurred."
+        return render_template(
+            'index.html', output=filename, contacts=contacts, error=error)
+    return render_template(
+        'index.html', 
+        output=filename, 
+        missing=missing,
+        contacts=contacts,
+        link=url_for('get_file', filename=filename))
 
 
 @app.route('/fix/<filename>.xml')

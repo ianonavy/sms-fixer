@@ -23,8 +23,8 @@ class SMS(object):
         if raw_message is None:
             raise
 
-        self.contact_name = contact_name
-        self.address = address
+        self.contact_name = contact_name.strip()
+        self.address = address.strip()
 
         if raw_message.find(class_='fn').text == contact_name:
             self.type = self.RECEIVED
@@ -70,7 +70,9 @@ def parse_args():
     parser.add_argument('--timezone', type=str, default=None,
                         help='timezone (default: local)')
     parser.add_argument('--contacts', type=str, default=None,
-                        help='example contacts')
+                        help='contacts in case of missing numbers. example: '
+                             '"First Last: +18885550123; Second Last: '
+                             '+18005550123"')
     return parser.parse_args()
 
 
@@ -99,17 +101,17 @@ def parse_numbers(soup):
     return zip(names, numbers)
 
 
-def create_address_book(soups):
+def create_address_book(soups, address_book={}):
     """Parses all HTML files to create a 'default' address book in case 
     there is an HTML file where the contact did not reply and we cannot
     determine the contact's phone number."""
-    address_book = {}
     for soup in soups:
         address_book.update(parse_numbers(soup))
     return address_book
 
 
-def fix_sms(input=[], output=sys.stdout, timezone=None, logger=None):
+def fix_sms(input=[], output=sys.stdout, timezone=None, logger=None,
+            address_book={}):
     """Converts Google Voice HTML files to SMS Backup & Restore XML
     files.
 
@@ -117,23 +119,31 @@ def fix_sms(input=[], output=sys.stdout, timezone=None, logger=None):
     :param output: file object for XML file
     :param timezone: string for timezone (see Wikipedia for list)
     :param logger: logging object
-    :return: contents of output
+    :param address_book: dict of name->numbers
+    :return: contents of output, set of names missing phone numbers
     """
     logger.info("Parsing HTML.")
     soups = [bs4.BeautifulSoup(in_file.read()) for in_file in input]
 
     logger.info("Creating address book.")
-    address_book = create_address_book(soups)
+    address_book = create_address_book(soups, address_book)
+    
     all_messages = []
+    missing = set()
 
     logger.info("Processing messages.")
     for soup in soups:
+        if not soup.text:
+            continue
         my_name, contact_name = get_names(soup)
         conversation_address_book = dict(parse_numbers(soup))
         if contact_name not in conversation_address_book:
             address = address_book.get(contact_name, '')
         else:
             address = conversation_address_book.get(contact_name)
+        if not address:
+            missing.add(contact_name)
+        print address, contact_name
 
         raw_messages = soup.find_all(class_="message")
         messages = map(lambda m: SMS(m, contact_name, address, timezone), 
@@ -163,7 +173,10 @@ def fix_sms(input=[], output=sys.stdout, timezone=None, logger=None):
     xml = ''.join(xml)
     output.write(xml)
     logger.info('Done.')
-    return xml
+    if missing:
+        logger.warning(
+            "Missing numbers (use --contacts): {0}".format(", ".join(missing)))
+    return xml, missing
 
 
 def main():
@@ -173,7 +186,11 @@ def main():
     logger.setLevel(logging.INFO)
     args = parse_args()
 
-    fix_sms(args.input, args.output, args.timezone, logger)
+    strip = lambda t: tuple([e.strip() for e in t])
+    contacts = dict([strip(l.split(':')) for l in args.contacts.split(';')
+                                         if ':' in l])
+
+    fix_sms(args.input, args.output, args.timezone, logger, contacts)
 
 
 if __name__ == '__main__':
