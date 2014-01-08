@@ -26,7 +26,7 @@ Exact commands vary with OS.
 2. Create a virtual environment in the same directory, and source the `activate` script. 
 3. Navigate into the directory and install the required Python packages with `pip install -r requirements.txt`.
 
-For the Web service (CentOS-test only):
+For the Web service (CentOS-tested only):
 
 1. Symlink or copy the file `conf/nginx.conf` into the nginx configuration directory (e.g. `/etc/nginx/conf.d/sms-fixer.conf' for CentOS).
 2. Symlink or copy the file `conf/supervisord.conf` into the supervisord configuration directory.
@@ -46,9 +46,11 @@ Updating
 
 To update, just run `git pull` in the repository. For the Web service, you may need to instruct supervisord to restart the daemons.
 
-Trademark Disclaimer
---------------------
+Disclaimers
+-----------
 
 "Google Voice" and "Android" are trademarks of Google Voice, Inc. 
 
-"SMS Backup & Restore" and the `sms.xml` file used for styling the output XML are trademark and copyright of Ritesh Sahu.
+"SMS Backup & Restore" is a trademark of Ritesh Sahu.
+
+The `sms.xml` file used for styling the output XML is intellectual property of Ritesh Sahu.
