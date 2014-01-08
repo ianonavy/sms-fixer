@@ -143,7 +143,6 @@ def fix_sms(input=[], output=sys.stdout, timezone=None, logger=None,
             address = conversation_address_book.get(contact_name)
         if not address:
             missing.add(contact_name)
-        print address, contact_name
 
         raw_messages = soup.find_all(class_="message")
         messages = map(lambda m: SMS(m, contact_name, address, timezone), 
