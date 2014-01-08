@@ -5,6 +5,7 @@ import calendar
 import datetime
 import logging
 import sys
+from xml.sax.saxutils import escape
 
 import bs4
 import dateutil.parser
@@ -29,7 +30,9 @@ class SMS(object):
         else:
             self.type = self.SENT
 
-        self.body = raw_message.find('q').text or ''
+        self.body = escape(raw_message.find('q').text or '')
+        self.body = self.body.replace("'", "&apos;")
+        self.body = self.body.replace('"', "&quot;")
         raw_date = raw_message.find(class_='dt').get('title', '')
         self.utc_date = dateutil.parser.parse(raw_date)
 
@@ -68,7 +71,12 @@ def parse_args():
 
 
 def get_names(soup):
-    return (name.strip() for name in soup.find('title').text.split('to'))
+    """Parses HTML file for contact names from the <title></title>."""
+    title = soup.find('title').text
+    if 'to' in title:
+        return (name.strip() for name in title.split(' to'))
+    else:
+        return ("Me", title)
 
 
 def parse_numbers(soup):
