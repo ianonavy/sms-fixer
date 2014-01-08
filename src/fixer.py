@@ -69,7 +69,7 @@ def parse_args():
                         help='output filename')
     parser.add_argument('--timezone', type=str, default=None,
                         help='timezone (default: local)')
-    parser.add_argument('--contacts', type=str, default=None,
+    parser.add_argument('--contacts', type=str, default="",
                         help='contacts in case of missing numbers. example: '
                              '"First Last: +18885550123; Second Last: '
                              '+18005550123"')
