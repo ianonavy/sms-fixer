@@ -17,7 +17,7 @@ class SMS(object):
 
     RECEIVED = 1
     SENT = 2
-    XML_FORMAT = """<sms protocol="0" address="{address}" date="{date}" type="{type}" subject="null" body="{body}" toa="null" sc_toa="null" service_center="null" read="1" status="-1" locked="0" date_sent="0" readable_date="{readable_date}" contact_name="{contact_name}" />"""
+    XML_FORMAT = u"""<sms protocol="0" address="{address}" date="{date}" type="{type}" subject="null" body="{body}" toa="null" sc_toa="null" service_center="null" read="1" status="-1" locked="0" date_sent="0" readable_date="{readable_date}" contact_name="{contact_name}" />"""
 
     def __init__(self, raw_message, contact_name, address, timezone):
         if raw_message is None:
@@ -161,16 +161,16 @@ def fix_sms(input=[], output=sys.stdout, timezone=None, logger=None,
     logger.info("Outputing XML to {0}".format(filename))
     date = datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
-    xml = ["""<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+    xml = [u"""<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <!--File Created By sms-fixer on {date}-->
 <?xml-stylesheet type="text/xsl" href="sms.xsl"?>
 <smses count="{count}">\n""".format(date=date, count=len(all_messages))]
     for message in all_messages:
-        xml.append("  {message}\n".format(message=message.to_xml()))
-    xml.append("</smses>")
+        xml.append(u"  {message}\n".format(message=message.to_xml()))
+    xml.append(u"</smses>")
 
-    xml = ''.join(xml)
-    output.write(xml)
+    xml = u''.join(xml)
+    output.write(xml.encode("utf-8"))
     logger.info('Done.')
     if missing:
         logger.warning(
